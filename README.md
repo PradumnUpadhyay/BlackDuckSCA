@@ -69,3 +69,6 @@ Example `config.json` structure:
   ```powershell
   .\main.ps1
 
+- The script will process the modules as per the configuration in config.json and generate the SBOM based on the provided .bd files.
+
+**NOTE:** Ensure that you have configured the config.json file correctly and have placed all necessary .bd files before running the script.
