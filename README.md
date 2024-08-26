@@ -4,10 +4,10 @@ This repository contains PowerShell scripts designed to automate the creation of
 
 ## Supported Scans
 
-- <span style="color:green;">&#x2705; **Python (PyPI)**</span>
-- <span style="color:green;">&#x2705;</span> **RedHat (rpm)**
-- <span style="color:red;">&#x274C;</span> **Maven (mvn)**
-- <span style="color:red;">&#x274C;</span> **GitHub Repositories**
+<span style="color:green;">&#x2705;</span> **Python (PyPI)** <br>
+<span style="color:green;">&#x2705;</span> **RedHat (rpm)** <br>
+<span style="color:red;">&#x274C;</span> **Maven (mvn)** <br>
+<span style="color:red;">&#x274C;</span> **GitHub Repositories** 
 
 ## Files in the Repository
 
@@ -20,8 +20,8 @@ This repository contains PowerShell scripts designed to automate the creation of
 ### Step 1: Clone the Repository
 
 ```sh
-git clone <repository-url>
-cd <repository-directory>
+git clone git@git.zeomega.com:upradumn/appsec.git
+cd appsec
 ```
 #### Step 2: Edit the `config.json` File
 
