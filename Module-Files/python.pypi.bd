@@ -1,0 +1,8 @@
+products.externalmethod==5.0
+products.localfs==3.0
+products.mailhost==5.0
+products.pluginregistry==2.0
+products.pythonscripts==5.0
+products.siteerrorlog==6.0
+products.sqlalchemyda==2.0
+products.standardcachemanagers==5.0
