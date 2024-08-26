@@ -22,7 +22,7 @@ This repository contains PowerShell scripts designed to automate the creation of
 ```sh
 git clone <repository-url>
 cd <repository-directory>
-
+```
 #### Step 2: Edit the `config.json` File
 
 - Add your Black Duck account token in the `config.json` file.
@@ -52,6 +52,7 @@ Example `config.json` structure:
         }
     }
 }
+```
 
 ### Step 3: Add Modules to `.bd` Files
 
@@ -59,7 +60,7 @@ Example `config.json` structure:
 - Add or update the `.bd` files for each module you want to scan according to the paths specified in the `config.json` file.
 - Ensure that each file matches the `filepath` field in the `config.json`. For example, if `config.json` has `"filepath": "./Module-Files/redhat.rpm.bd"`, make sure there is a `redhat.rpm.bd` file in the `Module-Files` folder with the required content.
 
-## Step 4: Execute the `main.ps1` Script
+### Step 4: Execute the `main.ps1` Script
 
 - Open a PowerShell terminal.
 - Navigate to the directory containing the scripts.
