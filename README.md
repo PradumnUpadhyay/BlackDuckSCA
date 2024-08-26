@@ -4,10 +4,10 @@ This repository contains PowerShell scripts designed to automate the creation of
 
 ## Supported Scans
 
-- **Python (pypi) Modules**
-- **RedHat (rpm) Modules**
-- **Maven (java) Modules**
-- **GitHub Repositories**
+- [x] **Python (PyPI)**
+- [x] **RedHat**
+- [ ] **Maven**
+- [ ] **GitHub**
 
 ## Files in the Repository
 
