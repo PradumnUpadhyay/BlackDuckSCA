@@ -4,8 +4,8 @@ This repository contains PowerShell scripts designed to automate the creation of
 
 ## Supported Scans
 
-- [x] **Python (PyPI)**
-- [x] **RedHat**
+- <span style="color: green;">[x] **Python (PyPI)**</span>
+- <span style="color: green;">[x] **RedHat**</span>
 - [ ] **Maven**
 - [ ] **GitHub**
 
