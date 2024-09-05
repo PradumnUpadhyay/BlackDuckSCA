@@ -1,5 +1,5 @@
-$logfile="../Error-Logs/scan_errors.log"
-$exists="../Error-Logs/exists.log"
+$logfile="./Error-Logs/scan_errors.log"
+$exists="./Error-Logs/exists.log"
 
 # Function to read configuration from a file
 function Read-Config {
@@ -52,9 +52,9 @@ function Create-Project {
         } elseif ($response.StatusCode -eq 200 -or $response.StatusCode -eq $null) {
             Write-Host -ForegroundColor Green "Project created successfully (no specific status code received) with name '$ProjectName' and version '$VersionName'."
         } else {
-            Write-Host -ForegroundColor Red "Unexpected status code: $($response.StatusCode). Response: $($response.Content)"
+            Write-Host -ForegroundColor Red "Unexpected status code: $($response.StatusCode). Response: $($response.StatusCode)"
         }
-        return $response.Content
+        return $response.StatusCode
 
     } catch {
         if ($_.Exception.Response.StatusCode.Value__ -eq 412) {
@@ -175,7 +175,7 @@ function Get-ProjectLink {
     $selectedProject = $items[$selectedProjectIndex]
     $projectLink = $selectedProject._meta.links | Where-Object { $_.rel -eq "versions" } | Select-Object -ExpandProperty href
 
-    return $projectLink
+    return @{ProjectLink = $projectLink; SelectedProjectName = $selectedProjectName}
 }
 
 # Function to send a GET request to the specified URL
@@ -540,6 +540,7 @@ function Scan-Modules {
         }
     }
 
+    Write-Host -ForegroundColor Green "Scan Completed. SBOM was created!"
     Write-Host -ForegroundColor DarkCyan "Please refer to scan_errors.log and exists.log for list of errors and modules, that weren't scanned."
 }
 
@@ -564,11 +565,14 @@ if ($action -eq '1') {
     Write-Host -ForegroundColor Cyan "Enter the version name:"
     $versionName = Read-Host
     $createProjectResponse = Create-Project -ProjectName $projectName -VersionName $versionName -Token $bearerToken -ServerUrl $serverUrl -ProjectGroupId $projectGroupId
-} elseif ($action -eq '2') {
+} 
+
+    if ($action -eq '2' -or $createProjectResponse -eq 201) {
     Write-Host -ForegroundColor Cyan "Enter the project name to query:"
     $projectName = Read-Host
     $queryProjectResponse = Query-ProjectName -Token $bearerToken -ProjectName $projectName -ServerUrl $serverUrl
-    $projectLink = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
+    $result = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
+    $projectLink = $result["ProjectLink"]
     if ($projectLink -ne $null) {
         $componentsLink = Get-ProjectVersionLink -JsonResponse (Send-GetRequest -Url $projectLink -Token $bearerToken)
     }
@@ -605,6 +609,7 @@ foreach ($moduleName in $modules.PSObject.Properties.Name) {
     }
 }
 
-$ending="*************************************************"
+$project = $result.SelectedProjectName
+$ending="*****************End of Project $project****************************"
 Add-Content -Path $logfile -Value $ending
 Add-Content -Path $exists -Value $ending

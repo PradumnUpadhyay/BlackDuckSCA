@@ -1,14 +1,14 @@
 {
     "server_url": "https://zeomega.app.blackduck.com",
     "project_group_id": "00000003-0003-0000-0000-000000000001",
-    "token": "blackduck_token",
+    "token": "MzVlY2RmZDYtNGU2ZS00ZmFkLWFlZDUtZTViNmE4OGQyNTEyOmZjZWJiYWFkLTEzOWUtNDc5MC1hZjM3LWRmZGNiZjU5YmEzZQ",
     "modules":{
         "pypi":{
-            "scan": false,
+            "scan": true,
             "filepath":"./Module-Files/python.pypi.bd"
         },
         "redhat":{
-            "scan": true,
+            "scan": false,
             "filepath":"./Module-Files/redhat.rpm.bd"
         },
         "maven":{
