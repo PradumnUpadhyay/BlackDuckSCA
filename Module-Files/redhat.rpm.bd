@@ -1,7 +1,6 @@
-libcurl-7.61.1-34.el8.x86_64
-rubygems-2.7.6.3-112.module+el8.10.0+22021+135c76a8.noarch
-java-1.8.0-openjdk-headless-1.8.0.422.b05-2.el8.x86_64
-dmidecode-3.5-1.el8.x86_64
-git-2.43.5-1.el8_10.x86_64
-wget-1.19.5-12.el8_10.x86_64
-libcurl-devel-7.61.1-34.el8.x86_64
+/**
+Format should be similar to the module name.
+Example:
+    libcurl-7.61.1-34.el8.x86_64
+    wget-1.19.5-12.el8_10.x86_64
+**/
