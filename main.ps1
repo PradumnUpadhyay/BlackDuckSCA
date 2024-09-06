@@ -567,7 +567,7 @@ if ($action -eq '1') {
     $createProjectResponse = Create-Project -ProjectName $projectName -VersionName $versionName -Token $bearerToken -ServerUrl $serverUrl -ProjectGroupId $projectGroupId
 } 
 
-    if ($action -eq '2' -or $createProjectResponse -eq 201) {
+if ($action -eq '2' -or $createProjectResponse -eq 201) {
     Write-Host -ForegroundColor Cyan "Enter the project name to query:"
     $projectName = Read-Host
     $queryProjectResponse = Query-ProjectName -Token $bearerToken -ProjectName $projectName -ServerUrl $serverUrl
@@ -576,7 +576,9 @@ if ($action -eq '1') {
     if ($projectLink -ne $null) {
         $componentsLink = Get-ProjectVersionLink -JsonResponse (Send-GetRequest -Url $projectLink -Token $bearerToken)
     }
-} else {
+}
+
+if($action -ne '1' -or $action -ne '2') {
     Write-Host -ForegroundColor Red "Invalid input. Please enter '1' or '2'."
     exit
 }
