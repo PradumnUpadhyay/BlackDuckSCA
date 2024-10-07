@@ -5,19 +5,19 @@
     "modules":{
         "pypi":{
             "scan": true,
-            "filepath":"./Module-Files/python.pypi.bd"
+            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\python.pypi.bd"
         },
         "redhat":{
             "scan": false,
-            "filepath":"./Module-Files/redhat.rpm.bd"
+            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\redhat.rpm.bd"
         },
         "maven":{
             "scan": false,
-            "filepath":"./Module-Files/java.maven.bd"
+            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\java.maven.bd"
         },
         "github":{
             "scan": false,
-            "filepath":"./Module-Files/github.repos.bd"
+            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\github.repos.bd"
         }
     }
 }

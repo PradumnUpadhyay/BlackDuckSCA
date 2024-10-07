@@ -1,6 +1,6 @@
 /**
-Format should be similar to requirements.txt File
+Format should be similar to the requirements.txt File.
 Example:
-    numpy==2.1.1
-    pandas==2.2.2
+    zope2==4.0
+    zope.i18n==5.0
 **/

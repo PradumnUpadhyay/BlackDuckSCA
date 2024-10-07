@@ -3,7 +3,7 @@ $exists="./Error-Logs/exists.log"
 
 # Function to read configuration from a file
 function Read-Config {
-    $configPath = "./config.json"
+    $configPath = "D:\\Pradumn\\GitLab_Upload\\config.json"
     if (Test-Path $configPath) {
         $configContent = Get-Content -Path $configPath -Raw
         $config = $configContent | ConvertFrom-Json
@@ -11,6 +11,28 @@ function Read-Config {
     } else {
         Write-Host -ForegroundColor Red "Configuration file not found."
         exit
+    }
+}
+
+# Function to get the bearer token
+function Get-BearerToken {
+    param (
+        [string]$Token,
+        [string]$ServerUrl
+    )
+
+    $url = "$ServerUrl/api/tokens/authenticate"
+    $headers = @{
+        "Accept" = "application/vnd.blackducksoftware.user-4+json"
+        "Authorization" = "token $Token"
+    }
+
+    try {
+        $response = Invoke-RestMethod -Uri $url -Method Post -Headers $headers
+        $bearerToken = $response.bearerToken
+        return $bearerToken
+    } catch {
+        Write-Error $_.Exception.Message
     }
 }
 
@@ -111,26 +133,24 @@ function Query-ProjectName {
     }
 }
 
-# Function to get the bearer token
-function Get-BearerToken {
+#Function to get Components Links as per the version
+function Get-ComponentLinks {
     param (
-        [string]$Token,
-        [string]$ServerUrl
+        [string]$ProjectName,
+        [string]$bearerToken,
+        [string]$serverUrl
     )
 
-    $url = "$ServerUrl/api/tokens/authenticate"
-    $headers = @{
-        "Accept" = "application/vnd.blackducksoftware.user-4+json"
-        "Authorization" = "token $Token"
+    $queryProjectResponse = Query-ProjectName -Token $bearerToken -ProjectName $projectName -ServerUrl $serverUrl
+    $result = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
+    $projectLink = $result["ProjectLink"]
+    if ($projectLink -ne $null) {
+        $componentsLink = Get-ProjectVersionLink -JsonResponse (Send-GetRequest -Url $projectLink -Token $bearerToken)
+    } else {
+        Write-Host -ForegroundColor Red "No Project Links found."
     }
 
-    try {
-        $response = Invoke-RestMethod -Uri $url -Method Post -Headers $headers
-        $bearerToken = $response.bearerToken
-        return $bearerToken
-    } catch {
-        Write-Error $_.Exception.Message
-    }
+    return $componentsLink
 }
 
 # Function to recursively parse JSON response and extract names
@@ -523,14 +543,12 @@ function Scan-Modules {
 
                 if ($StatusCode -eq 412) {
                     Write-Host -ForegroundColor Red "Component Already Exists! Name: $moduleName"
-
                     $errMsg = "Module: $moduleName; Exists: True"
 
                     Add-Content -Path "$exists" -Value $errMsg
                     
                 } else {
-                    Write-Host -ForegroundColor Red "An error occurred while starting the scan: $ExceptionMessage"
-                    
+                    Write-Host -ForegroundColor Red "An error occurred while starting the scan: $ExceptionMessage"                    
                     $errMsg = "Module: $moduleName; Exists: False; Error: $ExceptionMessage"
 
                     Add-Content -Path $logfile -Value $errMsg
@@ -565,20 +583,24 @@ if ($action -eq '1') {
     Write-Host -ForegroundColor Cyan "Enter the version name:"
     $versionName = Read-Host
     $createProjectResponse = Create-Project -ProjectName $projectName -VersionName $versionName -Token $bearerToken -ServerUrl $serverUrl -ProjectGroupId $projectGroupId
+    $componentsLink = Get-ComponentLinks -ProjectName $projectName -bearerToken $bearerToken -serverUrl $serverUrl
 } 
 
-if ($action -eq '2' -or $createProjectResponse -eq 201) {
+elseif ($action -eq '2' -or $createProjectResponse -eq 201) {
     Write-Host -ForegroundColor Cyan "Enter the project name to query:"
     $projectName = Read-Host
-    $queryProjectResponse = Query-ProjectName -Token $bearerToken -ProjectName $projectName -ServerUrl $serverUrl
-    $result = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
-    $projectLink = $result["ProjectLink"]
-    if ($projectLink -ne $null) {
-        $componentsLink = Get-ProjectVersionLink -JsonResponse (Send-GetRequest -Url $projectLink -Token $bearerToken)
-    }
+    $componentsLink = Get-ComponentLinks -ProjectName $projectName -bearerToken $bearerToken -serverUrl $serverUrl
+    # $queryProjectResponse = Query-ProjectName -Token $bearerToken -ProjectName $projectName -ServerUrl $serverUrl
+    # $result = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
+    # $projectLink = $result["ProjectLink"]
+    # if ($projectLink -ne $null) {
+    #     $componentsLink = Get-ProjectVersionLink -JsonResponse (Send-GetRequest -Url $projectLink -Token $bearerToken)
+    # } else {
+    #     Write-Host -ForegroundColor Red "No Project Links found."
+    # }
 }
 
-if($action -ne '1' -or $action -ne '2') {
+elseif($action -ne '1' -or $action -ne '2') {
     Write-Host -ForegroundColor Red "Invalid input. Please enter '1' or '2'."
     exit
 }
@@ -604,6 +626,7 @@ foreach ($moduleName in $modules.PSObject.Properties.Name) {
                 Scan-Modules -ComponentUrl $componentsLink -ComponentIds $componentUrls -Token $bearerToken
             } else {
                 Write-Host -ForegroundColor Red "No valid component URLs found for scanning."
+                $errM
             }
         } else {
             Write-Host -ForegroundColor Red "File not found: $filepath"
