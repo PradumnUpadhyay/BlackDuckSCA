@@ -142,8 +142,9 @@ function Get-ComponentLinks {
     )
 
     $queryProjectResponse = Query-ProjectName -Token $bearerToken -ProjectName $projectName -ServerUrl $serverUrl
-    $result = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
-    $projectLink = $result["ProjectLink"]
+    $global:result = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
+    $projectLink = $global:result["ProjectLink"]
+    Write-Host "Project Link: $projectLink"
     if ($projectLink -ne $null) {
         $componentsLink = Get-ProjectVersionLink -JsonResponse (Send-GetRequest -Url $projectLink -Token $bearerToken)
     } else {
@@ -539,7 +540,6 @@ function Scan-Modules {
             } catch {
                 $StatusCode = $_.Exception.Response.StatusCode.value__
                 $ExceptionMessage = $_.Exception.Message
-                $scan_error = ''
 
                 if ($StatusCode -eq 412) {
                     Write-Host -ForegroundColor Red "Component Already Exists! Name: $moduleName"
@@ -590,14 +590,7 @@ elseif ($action -eq '2' -or $createProjectResponse -eq 201) {
     Write-Host -ForegroundColor Cyan "Enter the project name to query:"
     $projectName = Read-Host
     $componentsLink = Get-ComponentLinks -ProjectName $projectName -bearerToken $bearerToken -serverUrl $serverUrl
-    # $queryProjectResponse = Query-ProjectName -Token $bearerToken -ProjectName $projectName -ServerUrl $serverUrl
-    # $result = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
-    # $projectLink = $result["ProjectLink"]
-    # if ($projectLink -ne $null) {
-    #     $componentsLink = Get-ProjectVersionLink -JsonResponse (Send-GetRequest -Url $projectLink -Token $bearerToken)
-    # } else {
-    #     Write-Host -ForegroundColor Red "No Project Links found."
-    # }
+
 }
 
 elseif($action -ne '1' -or $action -ne '2') {
@@ -626,7 +619,6 @@ foreach ($moduleName in $modules.PSObject.Properties.Name) {
                 Scan-Modules -ComponentUrl $componentsLink -ComponentIds $componentUrls -Token $bearerToken
             } else {
                 Write-Host -ForegroundColor Red "No valid component URLs found for scanning."
-                $errM
             }
         } else {
             Write-Host -ForegroundColor Red "File not found: $filepath"
@@ -634,7 +626,8 @@ foreach ($moduleName in $modules.PSObject.Properties.Name) {
     }
 }
 
-$project = $result.SelectedProjectName
-$ending="*****************End of Project $project****************************"
+$project = $global:result["SelectedProjectName"]
+
+$ending="*****************End of $project****************************"
 Add-Content -Path $logfile -Value $ending
 Add-Content -Path $exists -Value $ending
