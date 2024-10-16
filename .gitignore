@@ -1,2 +1,3 @@
-./Error-Logs/*
-./Module-Files/*
+Error-Logs/
+Module-Files/
+bearer.txt
