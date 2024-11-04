@@ -6,6 +6,7 @@ This repository contains PowerShell scripts designed to automate the creation of
 
 <span style="color:green;">&#x2705;</span> **Python (PyPI)** <br>
 <span style="color:green;">&#x2705;</span> **RedHat (rpm)** <br>
+<span style="color:green;">&#x2705;</span> **Nodejs (npm)** <br>
 <span style="color:red;">&#x274C;</span> **Maven (mvn)** <br>
 <span style="color:red;">&#x274C;</span> **GitHub Repositories** 
 
