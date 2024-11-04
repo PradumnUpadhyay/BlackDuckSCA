@@ -1,0 +1,42 @@
+apache-airflow ,click ,ConfigUpdater ,confluent-kafka ,Deprecated ,docutils ,Flask ,Flask-AppBuilder ,Flask-Caching ,Flask-JWT-Extended ,Flask-Limiter ,Flask-Session ,Flask-WTF ,gunicorn ,Jinja2 ,email-validator ,Mako ,MarkupSafe ,numpy ,opencensus-context ,packaging ,PyJWT ,pytz ,PyYAML ,Pygments ,kafka-python ,six ,tzdata ,rsa ,iniconfig ,SQLAlchemy ,SQLAlchemy-JSONField ,Werkzeug ,aiohappyeyeballs ,aiohttp ,aiohttp_cors ,aiosignal ,alembic ,annotated-types ,anyio ,apache-airflow-providers-common-compat ,apache-airflow-providers-common-io ,apache-airflow-providers-common-sql ,apache-airflow-providers-fab ,apache-airflow-providers-ftp ,apache-airflow-providers-apache-kafka ,apache-airflow-providers-http ,apache-airflow-providers-imap ,apache-airflow-providers-microsoft-mssql ,apache-airflow-providers-smtp ,apache-airflow-providers-sqlite ,apispec ,argcomplete ,async-timeout ,babel ,blinker ,cachelib ,cachetools ,clickclick ,prometheus-client ,colorama ,colorful ,connexion ,cramjam ,cron-descriptor ,croniter ,asgiref ,dnspython ,exceptiongroup ,fsspec ,Flask-Babel ,Flask-Login ,Flask-SQLAlchemy ,frozenlist ,google-api-core ,google-re2 ,googleapis-common-protos ,greenlet ,gretry ,grpcio ,h11 ,httpcore ,httpx ,idna ,importlib-resources ,inflection ,itsdangerous ,jmespath ,jsonschema-specifications ,lazy-object-proxy ,limits ,linkify-it-py ,markdown-it-py ,marshmallow-oneofschema ,marshmallow-sqlalchemy ,mccabe ,mdit-py-plugins ,mdurl ,memray ,methodtools ,more-itertools ,msgpack ,multidict ,opentelemetry-semantic-conventions ,opentelemetry-exporter-otlp-proto-grpc ,opencensus ,opentelemetry-api ,opentelemetry-exporter-otlp-proto-common ,opentelemetry-sdk ,ordered-set ,pandas ,pathspec ,pendulum ,pip ,platformdirs ,prison ,proto-plus ,requests ,psutil ,psycopg2-binary ,filelock ,setproctitle ,py-spy ,google-auth ,pyasn1 ,pyasn1-modules ,cryptography ,pycparser ,pydantic ,pydantic-core ,lockfile ,pymssql ,pyodbc ,setuptools ,cffi ,attrs ,certifi ,colorlog ,python-daemon ,python-dateutil ,dill ,distlib ,jsonschema ,marshmallow ,python-nvd3 ,pluggy ,protobuf ,remote-pdb ,python-slugify ,python-snappy ,typing-extensions ,typing-extensions ,unicodecsv ,importlib-metadata ,charset-normalizer ,ray ,referencing ,requests-toolbelt ,rfc3339-validator ,rich ,rich-argparse ,rpds-py ,simplejson ,smart-open ,sniffio ,SQLAlchemy-Utils ,sqlparse ,tabulate ,tenacity ,termcolor ,text-unidecode ,textual ,time-machine ,tomli ,uc-micro-py ,universal-pathlib ,urllib3 ,virtualenv ,wirerope ,wrapt ,WTForms ,yarl ,zipp ,Module: filelock; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask-AppBuilder; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask-Babel; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask-Caching; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask-JWT-Extended; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask-Limiter; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask-Login; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask-Session; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask-SQLAlchemy; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Flask-WTF; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: frozenlist; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: fsspec; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: google-api-core; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: google-auth; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: google-re2; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: googleapis-common-protos; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: greenlet; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: gretry; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: grpcio; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: gunicorn; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: h11; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: httpcore; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: httpx; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: idna; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: importlib_metadata; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: importlib_resources; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: inflection; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: itsdangerous; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: Jinja2; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: jmespath; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: jsonschema; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: jsonschema-specifications; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: kafka-python; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: lazy-object-proxy; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+Module: limits; Exists: False; Error: The remote server returned an error: (502) Bad Gateway.
+*****************End of APPSEC-2856****************************
+*****************End of APPSEC-2856****************************
+*****************End of APPSEC-2541****************************
+*****************End of APPSEC-2541****************************
+*****************End of APPSEC-test****************************
+*****************End of APPSEC-test****************************

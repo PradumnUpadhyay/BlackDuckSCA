@@ -1,6 +1,10 @@
-/**
-Format should be similar to the requirements.txt File.
-Example:
-    zope2==4.0
-    zope.i18n==5.0
-**/
+python-dateutil==2.8.2
+typing_extensions==4.4.0
+zope.component==6
+common==0.1.4
+db==1.0.3
+future==1.0.0
+py3-zope-configuration==5.0.1
+python-certifi==2023.07.22
+Requests==2.0.2
+webframework==1.0.1

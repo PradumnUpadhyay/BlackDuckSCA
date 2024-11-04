@@ -68,7 +68,7 @@ function Create-Project {
 
     try {
         $response = Invoke-WebRequest -Uri $url -Method Post -Headers $headers -Body $jsonPostData -UseBasicParsing
-        $response.StatusCode
+        
         if ($response.StatusCode -eq 201) {
             Write-Host -ForegroundColor Green "Project created successfully with name '$ProjectName' and version '$VersionName'."
         } elseif ($response.StatusCode -eq 200 -or $response.StatusCode -eq $null) {
@@ -144,7 +144,6 @@ function Get-ComponentLinks {
     $queryProjectResponse = Query-ProjectName -Token $bearerToken -ProjectName $projectName -ServerUrl $serverUrl
     $global:result = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
     $projectLink = $global:result["ProjectLink"]
-    Write-Host "Project Link: $projectLink"
     if ($projectLink -ne $null) {
         $componentsLink = Get-ProjectVersionLink -JsonResponse (Send-GetRequest -Url $projectLink -Token $bearerToken)
     } else {
@@ -312,6 +311,70 @@ function Scan-PyPIModules {
 
     return $componentUrls
 }
+
+# Function to scan NPM Modules
+
+function Scan-NpmModules {
+    param (
+        [string]$FileName,
+        [string]$Token,
+        [string]$ServerUrl
+    )
+
+    $componentUrls = @()
+    $moduleData = (Get-Content $FileName -Raw) | ConvertFrom-Json
+
+    if ($moduleData.PSObject.Properties.Name -contains "dependencies") {
+        $dependencies = $moduleData.dependencies
+
+        foreach ($dependency in $dependencies.PSObject.Properties) {
+            $moduleName = $dependency.Name
+            $versionName = $dependency.Value -replace '[^0-9.]', ''
+            $moduleQuery = "npmjs:$moduleName/$versionName"
+            $queryUrl = "$ServerUrl/api/components?q=$moduleQuery"
+            $headers = @{
+                "Accept" = "application/vnd.blackducksoftware.component-detail-4+json"
+                "Authorization" = "Bearer $Token"
+            }
+
+            try {
+                $response = Invoke-RestMethod -Uri $queryUrl -Method Get -Headers $headers | ConvertTo-Json -Depth 100
+                $jsonObject = ConvertFrom-Json $response
+                $totalCount = $jsonObject.totalCount
+
+                if ($totalCount -eq 0) {
+                    throw "ZeroCount"
+                }
+
+                if ($totalCount -gt 1) {
+                    Display-ComponentChoices -JsonResponse $response
+                    Write-Host -ForegroundColor Cyan "Enter the index of the component to select:"
+                    $selectedComponentIndex = Read-Host
+                    $selectedComponent = $jsonObject.items[$selectedComponentIndex]
+                    $componentUrls += @{ $moduleName = $selectedComponent.component }
+                } else {
+                    $componentUrls += @{ $moduleName = $jsonObject.items[0].variant }
+                }
+            } catch {
+                $errorMessage = $_.Exception.Message
+                if ($errorMessage -eq "ZeroCount") {
+                    Write-Host -ForegroundColor Red "Failed to retrieve component information: $moduleName, Version: $versionName"
+                    $errMsg = "Module: $moduleName, Version: $versionName; Exists: False; Error: Failed to retrieve component info"
+                    Add-Content -Path "$exists" -Value $errMsg
+                } else {
+                    Write-Host -ForegroundColor Red "An error occurred while querying component: $moduleName, Version: $versionName. Error: $errorMessage"
+                    $errMsg = "Module: $moduleName, Version: $versionName; Exists: False; Error: $errorMessage"
+                    Add-Content -Path "$logfile" -Value $errMsg
+                }
+            }
+        }
+    } else {
+        Write-Host -ForegroundColor Red "'dependencies' key does not exist in the JSON"
+    }
+
+    return $componentUrls
+}
+
 
 # Function to scan RedHat modules
 function Scan-RedHatModules {
@@ -609,6 +672,7 @@ foreach ($moduleName in $modules.PSObject.Properties.Name) {
 
             switch ($moduleName) {
                 "pypi" { $componentUrls = Scan-PyPIModules -FileName $filepath -Token $bearerToken -ServerUrl $serverUrl }
+                "npm" { $componentUrls = Scan-NpmModules -FileName $filepath -Token $bearerToken -ServerUrl $serverUrl }
                 "redhat" { $componentUrls = Scan-RedHatModules -FileName $filepath -Token $bearerToken -ServerUrl $serverUrl }
                 "maven" { $componentUrls = Scan-MavenModules -FileName $filepath -Token $bearerToken -ServerUrl $serverUrl }
                 "github" { $componentUrls = Scan-GitHubModules -FileName $filepath -Token $bearerToken -ServerUrl $serverUrl }

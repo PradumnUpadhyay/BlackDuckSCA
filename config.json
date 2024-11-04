@@ -7,6 +7,10 @@
             "scan": true,
             "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\python.pypi.bd"
         },
+        "npm":{
+            "scan": false,
+            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\nodejs.npm.bd"
+        },
         "redhat":{
             "scan": false,
             "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\redhat.rpm.bd"
