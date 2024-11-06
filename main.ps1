@@ -248,6 +248,7 @@ function Get-ProjectVersionLink {
     $componentsLink = $selectedVersionObject._meta.links | Where-Object { $_.rel -eq "components" }
 
     if ($componentsLink -ne $null) {
+        $global:versionId = $componentsLink.href
         return $componentsLink.href
     } else {
         Write-Host -ForegroundColor Red "No components link found for version $selectedVersionName"
@@ -625,6 +626,38 @@ function Scan-Modules {
     Write-Host -ForegroundColor DarkCyan "Please refer to scan_errors.log and exists.log for list of errors and modules, that weren't scanned."
 }
 
+# Function to Generate Report
+function Create-ScanReport {
+    param (
+        [string]$Token,
+        [string]$VersionID,
+        [string]$ServerUrl
+    )
+
+    $headers = @{
+        "Content-Type"  = "application/json"
+        "Accept"        = "*/*"
+        "Authorization" = "Bearer $Token"
+    }
+
+    $body = @{
+        reportFormat       = "CSV"
+        reportType         = "VERSION"
+        categories         = @("VERSION", "CODE_LOCATIONS", "COMPONENTS", "SECURITY", "FILES")
+        includeSubprojects = $true
+    } | ConvertTo-Json
+
+    try {
+        $response = Invoke-RestMethod -Uri "$ServerUrl/api/versions/$VersionID/reports" -Method Post -Headers $headers -Body $body -ErrorAction Stop
+    } catch {
+        $StatusCode = $_.Exception.Response.StatusCode.value__
+        $ExceptionMessage = $_.Exception.Message
+        Add-Content -Path $logfile -Value $ExceptionMessage
+        
+        Write-Host -ForegroundColor Red "$ExceptionMessage"
+    }
+}
+
 # Main script execution
 $config = Read-Config
 
@@ -689,6 +722,26 @@ foreach ($moduleName in $modules.PSObject.Properties.Name) {
         }
     }
 }
+
+# Prompting user for genrating report
+Write-Host -ForegroundColor Yellow "`nWould you like to generate Report(y/n)?"
+$generateReport = Read-Host
+
+if ($generateReport -match "^(y|yes)$") {
+
+    try {
+    $versionID = $versionId.Split("/")[-2]
+    Create-ScanReport -ServerUrl $serverUrl -Token $bearerToken -VersionID $versionID
+
+    Write-Host -ForegroundColor Green "Report was generated Successfully!"
+
+} catch {
+    $StatusCode = $_.Exception.Response.StatusCode.value__
+    $ExceptionMessage = $_.Exception.Message
+
+    Add-Content -Path $logfile -Value $ExceptionMessage
+}
+} else {exit}
 
 $project = $global:result["SelectedProjectName"]
 
