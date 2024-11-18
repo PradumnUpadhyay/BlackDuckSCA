@@ -1,6 +1,6 @@
 # Black Duck Automation Script for Creating SBOM
 
-This repository contains PowerShell scripts designed to automate the creation of a Software Bill of Materials (SBOM) using Black Duck. The scripts currently support scanning Python, RedHat, Maven, and GitHub modules.
+This repository contains PowerShell scripts designed to automate the creation of a Software Bill of Materials (SBOM) using Black Duck. The scripts currently support scanning Python, RedHat, Nodejs, Maven, and GitHub modules.
 
 ## Supported Scans
 

@@ -48,8 +48,8 @@ function Create-Project {
 
     $url = "$ServerUrl/api/projects/"
     $headers = @{
-        "Accept"        = "application/vnd.blackducksoftware.project-detail-7+json"
-        "Content-Type"  = "application/vnd.blackducksoftware.project-detail-7+json"
+        "Accept"        = "*/*"
+        "Content-Type"  = "application/json"
         "Authorization" = "Bearer $Token"
     }
     $postData = @{
@@ -67,7 +67,7 @@ function Create-Project {
     $jsonPostData = $postData | ConvertTo-Json -Depth 10
 
     try {
-        $response = Invoke-WebRequest -Uri $url -Method Post -Headers $headers -Body $jsonPostData -UseBasicParsing
+        $response = Invoke-RestMethod -Uri $url -Method Post -Headers $headers -Body $jsonPostData -UseBasicParsing
         
         if ($response.StatusCode -eq 201) {
             Write-Host -ForegroundColor Green "Project created successfully with name '$ProjectName' and version '$VersionName'."
@@ -80,12 +80,15 @@ function Create-Project {
 
     } catch {
         if ($_.Exception.Response.StatusCode.Value__ -eq 412) {
+
+            $query = Query-ProjectName -Token $Token -ProjectName $ProjectName -ServerUrl $ServerUrl
             Write-Host -ForegroundColor Yellow "Project already exists. Do you want to create a new version with version: '$VersionName'?(Y/N)"
             $createVersion = Read-Host
 
-            if($createVersion -eq 'Y') {
+            $ProjectId = $query.items[0]._meta.href.Split("/")[-1]
+            if($createVersion -match "^(y|yes)$") {
             # URL for creating a new version
-            $versionUrl = "$ServerUrl/api/projects/$ProjectName/versions"
+            $versionUrl = "$ServerUrl/api/projects/$ProjectId/versions"
             $versionData = @{
                 "versionName" = $VersionName
                 "phase"       = "PLANNING"
@@ -103,6 +106,7 @@ function Create-Project {
                 return 
             } catch {
                 Write-Host -ForegroundColor Red "An error occurred while creating the new version: $($_.Exception.Message)"
+                exit
             }
         } else { exit }
     } else {
@@ -140,7 +144,7 @@ function Get-ComponentLinks {
         [string]$bearerToken,
         [string]$serverUrl
     )
-
+    
     $queryProjectResponse = Query-ProjectName -Token $bearerToken -ProjectName $projectName -ServerUrl $serverUrl
     $global:result = Get-ProjectLink -JsonResponse ($queryProjectResponse | ConvertTo-Json -Depth 100)
     $projectLink = $global:result["ProjectLink"]
@@ -229,6 +233,7 @@ function Get-ProjectVersionLink {
     $jsonObject = $JsonResponse | ConvertFrom-Json
     # Write-Host "$jsonObject"
     $items = $jsonObject.items
+    $totalCount = $jsonObject.totalCount
 
     Write-Host -ForegroundColor Yellow "Versions:"
     $versionNames = @()
@@ -239,15 +244,24 @@ function Get-ProjectVersionLink {
         $versionNames += $versionName
         $index++
     }
+
+    do {
+        Write-Host -ForegroundColor Cyan "Enter the index of the version to Scan:"
+        $selectedVersionIndex = Read-Host
+        if (($selectedVersionIndex -lt 0) -or ($selectedVersionIndex -ge $totalCount)) {
+            Write-Host -ForegroundColor Red "Invalid index. Please enter a valid index."
+        } else {
+            break
+        }
+    } until ($selectedVersionIndex -ge 0 -and $selectedVersionIndex -lt $totalCount)
     
-    Write-Host -ForegroundColor Cyan "Enter the index of the version to view details:"
-    $selectedVersionIndex = Read-Host
-    $selectedVersionName = $versionNames[$selectedVersionIndex]
     
+    $selectedVersionName = $versionNames[$selectedVersionIndex]  
     $selectedVersionObject = $items | Where-Object { $_.versionName -eq $selectedVersionName }
     $componentsLink = $selectedVersionObject._meta.links | Where-Object { $_.rel -eq "components" }
 
     if ($componentsLink -ne $null) {
+
         $global:versionId = $componentsLink.href
         return $componentsLink.href
     } else {
@@ -298,13 +312,13 @@ function Scan-PyPIModules {
             if ($_.Exception.Message -eq "ZeroCount") {
                 Write-Host -ForegroundColor Red "Failed to retrieve component information: $moduleName, Version: $version"
 
-                $errMsg = "Module: $mouleName, Version: $version; Exists: False; Error: Failed to retrieve component info"
+                $errMsg = "Module: $moduleName, Version: $version; Exists: False; Error: Failed to retrieve component info"
                 Add-Content -Path "$exists" -Value $errMsg
             } else {
                 $ExceptionMessage = $_.Exception.Message
                 Write-Host -ForegroundColor Red "An error occurred while querying component: $moduleName, Version: $version. Error: $ExceptionMessage"
 
-                $errMsg = "Module: $mouleName, Version: $version; Exists: False; Error: $ExceptionMessage"
+                $errMsg = "Module: $moduleName, Version: $version; Exists: False; Error: $ExceptionMessage"
                 Add-Content -Path "$logfile" -Value $errMsg
             }
         }
@@ -587,6 +601,14 @@ function Scan-Modules {
         [string]$Token
     )
 
+    # Initialize counters for tracking progress and errors
+    $totalModules = $ComponentIds.Count
+    $successfulScans = 0
+    $errorCount = 0
+    $errors = @()  # Array to store details of encountered errors
+
+    $currentModule = 0  # Track the current module index for progress calculation
+
     foreach ($componentIdHash in $ComponentIds) {
         foreach ($moduleName in $componentIdHash.Keys) {
             $componentId = $componentIdHash[$moduleName]
@@ -594,44 +616,73 @@ function Scan-Modules {
                 "Content-Type" = "application/json"
                 "Authorization" = "Bearer $Token"
             }
+
             $queryParams = @{
                 component = $componentId
             }
+
             $jsonData = $queryParams | ConvertTo-Json
+            $currentModule++
 
             try {
-                $response = Invoke-RestMethod -Uri $ComponentUrl -Method Post -Headers $headers -Body $jsonData
+                # Attempt to send the API request
+                Invoke-RestMethod -Uri $ComponentUrl -Method Post -Headers $headers -Body $jsonData
+                $successfulScans++  # Increment successful scans if no error occurs
             } catch {
+                # Capture the error details
                 $StatusCode = $_.Exception.Response.StatusCode.value__
                 $ExceptionMessage = $_.Exception.Message
+                $errorCount++  # Increment error count
 
+                # Check if the component already exists (status code 412)
                 if ($StatusCode -eq 412) {
-                    Write-Host -ForegroundColor Red "Component Already Exists! Name: $moduleName"
                     $errMsg = "Module: $moduleName; Exists: True"
-
-                    Add-Content -Path "$exists" -Value $errMsg
-                    
+                    Add-Content -Path $exists -Value $errMsg
                 } else {
-                    Write-Host -ForegroundColor Red "An error occurred while starting the scan: $ExceptionMessage"                    
                     $errMsg = "Module: $moduleName; Exists: False; Error: $ExceptionMessage"
-
                     Add-Content -Path $logfile -Value $errMsg
                 }
 
+                # Add error details to the errors array for tracking
+                $errors += @{
+                    ModuleName = $moduleName
+                    StatusCode = $StatusCode
+                    ErrorMessage = $ExceptionMessage
+                }
             }
+
+            # Calculate completion percentage and display it on a single line
+            $completionPercentage = ($currentModule / $totalModules) * 100
+            Write-Host -NoNewline -ForegroundColor Green ("`rScanning: {0}/{1} ({2:P2} complete) Errors: {3}" -f $currentModule, $totalModules, ($completionPercentage / 100), $errorCount)
         }
     }
 
+    # Final output with summary
+    Write-Host  # New line after the progress indicator
     Write-Host -ForegroundColor Green "Scan Completed. SBOM was created!"
-    Write-Host -ForegroundColor DarkCyan "Please refer to scan_errors.log and exists.log for list of errors and modules, that weren't scanned."
+    Write-Host -ForegroundColor Cyan ("Total Modules: {0}, Successful Scans: {1}, Errors: {2}" -f $totalModules, $successfulScans, $errorCount)
+
+    # Display summary of errors encountered
+    if ($errorCount -gt 0) {
+        Write-Host -ForegroundColor Yellow "Errors encountered during scan:"
+        foreach ($error in $errors) {
+            Write-Host -ForegroundColor Red ("Module: {0}, Status Code: {1}, Error: {2}" -f $error.ModuleName, $error.StatusCode, $error.ErrorMessage)
+        }
+    } else {
+        Write-Host -ForegroundColor Green "No errors encountered during scan."
+    }
+
+    Write-Host -ForegroundColor DarkCyan "Please refer to $logfile and $exists for the list of errors and modules that weren't scanned."
 }
+
 
 # Function to Generate Report
 function Create-ScanReport {
     param (
         [string]$Token,
         [string]$VersionID,
-        [string]$ServerUrl
+        [string]$ServerUrl,
+        [string]$ProjectName
     )
 
     $headers = @{
@@ -648,13 +699,36 @@ function Create-ScanReport {
     } | ConvertTo-Json
 
     try {
-        $response = Invoke-RestMethod -Uri "$ServerUrl/api/versions/$VersionID/reports" -Method Post -Headers $headers -Body $body -ErrorAction Stop
+        $response = Invoke-WebRequest -Uri "$ServerUrl/api/versions/$VersionID/reports" -Method Post -Headers $headers -Body $body -ErrorAction Stop
+        
+        $reportId = $response.Headers["Link"].Split("/")[-1].Split(">")[0]
+        $projectId = $global:result["ProjectLink"].Split("/")[-2]
+        
+        if($response.StatusCode -eq 201) {
+          
+            Write-Host -ForegroundColor DarkGreen "Current status: Creating Report..."
+            do {
+                $reportResponse = Invoke-WebRequest -Uri "$ServerUrl/api/projects/$projectId/versions/$VersionID/reports/$reportId" -Method Get -Headers $headers -ErrorAction Stop | ConvertFrom-Json 
+                $status = $reportResponse.status
+                
+                Write-Host "Current status: $status"
+                Start-Sleep -Seconds 5
+                
+            } while ($status -ne "COMPLETED" -or $reportResponse -ne 200)
+            
+            Write-Host -ForegroundColor Green "Current status: Report Genrated!!"
+
+            Invoke-WebRequest -Uri "$ServerUrl/api/projects/$projectId/versions/$VersionID/reports/$reportId/download.zip" -Method Get -Headers $headers -ErrorAction Stop -OutFile "./Reports/$ProjectName.zip"
+      } else { 
+        $statusCode = $response.StatusCode
+        Write-Host "Couldn't Download Report. Status Code: $statusCode"
+      }
     } catch {
         $StatusCode = $_.Exception.Response.StatusCode.value__
         $ExceptionMessage = $_.Exception.Message
         Add-Content -Path $logfile -Value $ExceptionMessage
         
-        Write-Host -ForegroundColor Red "$ExceptionMessage"
+        Write-Host -ForegroundColor Red "Status Code: $Statuscode `n$ExceptionMessage"
     }
 }
 
@@ -731,9 +805,9 @@ if ($generateReport -match "^(y|yes)$") {
 
     try {
     $versionID = $versionId.Split("/")[-2]
-    Create-ScanReport -ServerUrl $serverUrl -Token $bearerToken -VersionID $versionID
+    Create-ScanReport -ServerUrl $serverUrl -Token $bearerToken -VersionID $versionID -ProjectName $projectName
 
-    Write-Host -ForegroundColor Green "Report was generated Successfully!"
+    Write-Host -ForegroundColor Green "Report was downloaded Successfully!"
 
 } catch {
     $StatusCode = $_.Exception.Response.StatusCode.value__
