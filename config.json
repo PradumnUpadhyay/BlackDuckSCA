@@ -1,27 +1,27 @@
 {
-    "server_url": "https://zeomega.app.blackduck.com",
-    "project_group_id": "00000003-0003-0000-0000-000000000001",
-    "token": "MzVlY2RmZDYtNGU2ZS00ZmFkLWFlZDUtZTViNmE4OGQyNTEyOmZjZWJiYWFkLTEzOWUtNDc5MC1hZjM3LWRmZGNiZjU5YmEzZQ",
+    "server_url": "<BlackDuck_Server_URL>",
+    "project_group_id": "<BlackDuck_Group_ID>",
+    "token": "<BlackDuck_API_Token>",
     "modules":{
         "pypi":{
             "scan": true,
-            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\python.pypi.bd"
+            "filepath":"./Module-Files/python.pypi.bd"
         },
         "npm":{
             "scan": false,
-            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\nodejs.npm.bd"
+            "filepath":"./Module-Files/nodejs.npm.bd"
         },
         "redhat":{
             "scan": false,
-            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\redhat.rpm.bd"
+            "filepath":"./Module-Files/redhat.rpm.bd"
         },
         "maven":{
             "scan": false,
-            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\java.maven.bd"
+            "filepath":"./Module-Files/java.maven.bd"
         },
         "github":{
             "scan": false,
-            "filepath":"D:\\Pradumn\\GitLab_Upload\\Module-Files\\github.repos.bd"
+            "filepath":"./Module-Files/github.repos.bd"
         }
     }
 }

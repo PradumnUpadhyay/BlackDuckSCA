@@ -3,7 +3,7 @@ $exists="./Error-Logs/exists.log"
 
 # Function to read configuration from a file
 function Read-Config {
-    $configPath = "./config.json"
+    $configPath = "D:\\Pradumn\\GitLab_Upload\\config.json"
     if (Test-Path $configPath) {
         $configContent = Get-Content -Path $configPath -Raw
         $config = $configContent | ConvertFrom-Json
@@ -103,7 +103,7 @@ function Create-Project {
                 } else {
                     Write-Host -ForegroundColor Red "Failed to create new version. Status code: $($versionResponse.StatusCode). Response: $($versionResponse.Content)"
                 }
-                return ;
+                return 
             } catch {
                 Write-Host -ForegroundColor Red "An error occurred while creating the new version: $($_.Exception.Message)"
                 exit
