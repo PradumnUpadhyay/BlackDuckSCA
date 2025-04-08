@@ -21,8 +21,8 @@ This repository contains PowerShell scripts designed to automate the creation of
 ### Step 1: Clone the Repository
 
 ```sh
-git clone git@git.zeomega.com:upradumn/appsec.git
-cd appsec
+git clone https://github.com/PradumnUpadhyay/BlackDuckSCA.git
+cd BlackDuckSCA
 ```
 #### Step 2: Edit the `config.json` File
 
